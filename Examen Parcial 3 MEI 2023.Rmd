@@ -257,12 +257,85 @@ El medicamento estándar para el tratamiento de la oncocercosis es la ivermectin
 
 Escibe un conjunto de ecuaciones diferenciales que describan esa situación. Justifica tus respuestas describiendo con detalle tus ecuaciones y supuestos asumidos. Resuelve tu sistema en R.
 
-$$ \dot L_e= -\beta_1SI -\beta_2 SB$$
+$$ \dot S_V= \mu(S_V+I_V)
+-          m\beta_VS_VI_H
+-(1-m)\alpha\beta_VS_VI_H
+-          mt\beta_VS_VI_{HT}
+-(1-m)t\alpha\beta_VS_VI_{HT}
+-\mu S_V$$
 
-$$ \dot L_m= -\beta_1SI -\beta_2 SB$$
+$m(S_V+I_V)$ es la natalidad que compensa la mortalidad de los vectores $\mu$
 
-$$ \dot L_h= -\beta_1SI -\beta_2 SB$$
-$$ \dot L_a= mad_aL_h*$$
+$m\beta_VS_VI_H$ modela la infección de moscas susceptibles al interactuar con humanos infectados cerca del rio (proporcion m)
+
+$(1-m)\alpha\beta_VS_VI_H$ modela la infección de moscas susceptibles al interactuar con humanos infectados lejos del rio (proporcion 1-m). La interacción entre moscas infectadas y humanos se ve atenuada por $\alpha$
+
+$mt\beta_VS_VI_{HT}$ modela la infección de moscas susceptibles al interactuar con humanos infectados pero también tratados cerca del rio (proporcion m). La interacción no es tan eficaz porque hay menos parasitemia en estos pacientes (atenuado por $t$)
+
+$(1-m)t\alpha\beta_VS_VI_{HT}$ Considera a las personas tratadas y que están lejos del rio (1-m)
+
+
+
+$$ \dot I_V=
++          m\beta_VS_VI_H
++(1-m)\alpha\beta_VS_VI_H
++          mt\beta_VS_VI_{HT}
++(1-m)t\alpha\beta_VS_VI_{HT} 
+-\mu I_V$$
+
+$$ \dot S_H= \eta(S_H+I_H+I_{HT})
+-m\beta_HS_HI_V
+-(1-m)\alpha\beta_HS_HI_V
+-\eta S_H$$
+
+$\eta(S_H+I_H+I_{HT})$ natalidad que compensa la mortalidad de humanos
+
+$m\beta_HS_HI_V$ infección de personas cercanas al rio m
+
+$(1-m)\alpha\beta_HS_HI_V$ infeccion de personas lejanas al rio 1-m modificada por interacción disminuida ($\alpha$)
+
+$$ \dot I_H=
++m\beta_HS_HI_V
++(1-m)\alpha\beta_HS_HI_V
+-(p-I_{HT})I_H
+-\eta I_H$$
+
+$(p-I_{HT})I_H$ Tratamiento de personas infectadas hasta alcanzar un valor umbral de tratamiento disponible ($p$)
+
+$$ \dot I_{HT}=(p-I_{HT})I_H
+-\eta I_{HT}$$
+
+
+```{r, cache = TRUE}
+beta1 <- 0.2
+beta2 <- 0.05
+gamma <- 0.3
+r <- 0.75
+delta <- 0.9
+
+
+library(deSolve)
+modeloDirectoeIndirecto <- function(t, state, parameters){
+  with(as.list(c(state, parameters)), {
+  dS <- - beta1*S*I - beta2*S*B 
+  dI <- + beta1*S*I + beta2*S*B - gamma*I 
+  dR <-                           gamma*I 
+  dB <- r*I-delta*B
+    list(c(dS,dI,dR,dB))
+  })
+}
+pars <- c(beta1, beta2, gamma, r, delta)
+tiempo <- seq(0,50, by = 0.01)
+
+library(colorspace)
+condiciones_iniciales <- c(S=0.95,I=0.05,R=0,B=0)
+out <- ode(condiciones_iniciales, tiempo, modeloDirectoeIndirecto, pars)
+matplot(out[ , 1], out [ , 2:5], type = "l", xlab = "tiempo", ylab = "Poblacion o carga parasitaria/grado de contaminacion", ylim=c(0,1),
+        main = "modeloDirectoeIndirecto, R0=0.805",col = c("#FD4235","#CC53CC","#41521F","#E9C46A"), lwd = 2,lty=1)
+        legend("topright", c("S", "I", "R","B"), col = c("#FD4235","#CC53CC","#41521F","#E9C46A"), lwd = 4,lty=1, cex=0.75)
+```
+
+
 
 ## Tydiverse
 Utiliza la librería `palmerpenguins` par el siguiente problema. Carga los datos, incluidos en esa librería, `penguins` a partir de ello escribe un script en R qu resuelva lo siguiente:
