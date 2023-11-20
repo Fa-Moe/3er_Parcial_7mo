@@ -1,0 +1,95 @@
+---
+title: "Examen Parcial 3 Modelaje de Enfermedades Infecciosas 2023"
+author: "Roberto Álvarez"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+## Enfermedad infecciosa determinada por el ambiente
+
+Considera una enfermedad infecciosa impulsada por factores ambientales, como el cólera y la toxoplasmosis (una enfermedad parasitaria causada por T. *gondii*). Para este tipo de enfermedad, la transmisión ocurre cuando los huéspedes susceptibles tienen contacto con un entorno contaminado, y la tasa de contaminación del entorno depende tanto del número de huéspedes infectados como de la carga patógena promedio dentro de un huésped infectado. Una forma de modelar la dinámica de transmisión para tal enfermedad es considerar tanto la transmisión de la enfermedad a nivel de la población como el proceso de infección dentro de los huéspedes.
+
+$$\dot T_1 = \Lambda -kVT_1 -mT$$
+$$\dot T_2= kVT -(m+d)T_2$$
+$$ \dot V= g(E) +pT_2-cV$$
+$$ \dot S= \mu(S+I) -\lambda ES -\mu S$$
+$$\dot I =\lambda ES -\mu I$$
+
+$$ \dot E= \theta(V)I(1-E) -\gamma E$$
+
+
+Con, las variables $T_1,T_2, V$  son las densidades de células sanas, infectadas y carga parasitaria respectivamente.
+
+-   Dibuja un esquema por compartimentos de este modelo
+- Describe el resto de las ecuaciones y parámetros.¿Qué son $g(E)$  y $\theta(V)$ ?
+- Justifica porque es un buen sistema de ecuaciones para describir el problema
+-   Resuelve numéricamente este sistema en R.
+
+## Vacunación y valor umbral
+
+Considera una población en la cual una fracción $p \in (0, 1 )$ de los recién nacidos son exitosamente vacunados y asume inmunidad permanente después de la infección y la vacunación. Supongamos que los individuos infecciosos son tratados a una tasa per cápita $r$. Sea $R_c$ el número de reproducción de control tal que el equilibrio libre de enfermedad es asintóticamente estable cuando $R_c < 1$. Considera una enfermedad para la cual $\beta = 0.86$, $\gamma = 1/14$ $días^{-1}$, $\mu = 1/75$ $años^{−1}$. Usa el siguiente modelo SIR para calcular el nivel de inmunidad umbral $p_c$ tal que $R_c < 1$ para $p > p_c$.
+
+$$\dot S = \mu N(1-p)-\beta S\frac{I}{N} -\mu S$$ $$\dot I = \beta S\frac{I}{N} -(\gamma  +\mu +r) I$$ $$\dot R =\mu N p +(\gamma + r)I-\mu R$$ con $$N=S+I+R$$
+
+-   Dibuja un esquema por compartimentos de este modelo
+- Justifica porque es un buen sistema de ecuaciones para describir el problema
+-   Encuentra $p_c$ en ausencia de tratamiento ($r=0$)
+-   Encuentra $p_c$ con $r=0.2$
+-   Resuelve numéricamente este sistema en R.
+
+## Modelos de transmisón directa e indirecta
+
+Algunas enfermedades pueden propagarse de más de una manera. Por ejemplo, el cólera puede transmitirse de persona a persona, pero también puede transmitirse indirectamente a través de un patógeno liberado por personas infectadas a través de un medio como agua contaminada. Considera un modelo epidémico con transmisión directa (de persona a persona) e indirecta (a través de un medio como agua contaminada). A un modelo S I R simple le agregamos un patógeno $B$ liberado por personas infectadas. Suponemos que la infectividad del patógeno es proporcional a su concentración. El modelo resultante es:
+
+$$ \dot S= -\beta_1SI -\beta_2 SB$$ $$\dot I =  \beta_1SI + \beta_2 SB -\gamma I$$
+
+$$\dot R =\gamma I$$
+
+$$\dot B = rI -\delta B$$
+
+con $N=S+I+R$
+
+-   Dibuja un esquema por compartimentos de este modelo
+-   Justifica porque es un buen sistema de ecuaciones para describir el problema
+-   Justifica porque la siguiente expresión puede ser un buen $R_0=\frac{\beta_1 N}{\gamma} +\frac{r\beta_2 N}{\gamma \delta}$
+-   Resuelve numéricamente este sistema en R para valores de $R_0 >1$ y $R_0 <1$ Discute tus resultados.
+
+## Enfermedades transmitidas por vectores
+
+La oncocercosis, también conocida como "ceguera de los ríos", es una enfermedad transmitida por vectores que afecta la piel y los ojos de los seres humanos. Es endémica en partes de África, Yemen y América Central, y es especialmente prevalente en el África subsahariana. Se transmite por Onchocerca volvulus, un gusano parásito cuyo ciclo de vida incluye cinco etapas larvarias, incluyendo una etapa que requiere un huésped humano y otra etapa que requiere un huésped mosca negra.
+
+La hora pico de picadura de las moscas negras es durante las horas diurnas, y las moscas negras permanecen cerca de sus lugares de reproducción en aguas bien oxigenadas. Por lo tanto, las comunidades en el borde del río están más expuestas al riesgo. La etapa del vector es muy complicada, y sería difícil incluir todas sus etapas en un modelo. Supondremos un tamaño de población total constante para el vector con un modelo SI para los vectores.
+
+El medicamento estándar para el tratamiento de la oncocercosis es la ivermectina; la administración oral mata las larvas rápidamente pero no mata a los gusanos adultos. Sin embargo, reduce su tasa reproductiva durante varios meses. El tratamiento con ivermectina está disponible para una fracción $p$ de la población, limitada por restricciones sobre quiénes pueden recibir la medicación, atención médica limitada y disposición a participar.
+
+Escibe un conjunto de ecuaciones diferenciales que describan esa situación. Justifica tus respuestas describiendo con detalle tus ecuaciones y supuestos asumidos. Resuelve tu sistema en R.
+
+## Tydiverse
+Utiliza la librería `palmerpenguins` par el siguiente problema. Carga los datos, incluidos en esa librería, `penguins` a partir de ello escribe un script en R qu resuelva lo siguiente:
+
+ 1. Filtra los pingüinos que pertenecen a la especie "Adelie" y tienen un peso corporal mayor a 3500 gramos.
+2. Crea una nueva columna llamada "bmi" (Body Mass Index) que represente el índice de masa corporal usando la fórmula: 
+$$ BMI = peso (kg) / (altura (m))^2$$. 
+La altura está representada en centímetros en la base de datos, así que conviértela a metros.
+
+3. Agrupa los datos por la especie y calcula la media del índice de masa corporal (bmi) para cada especie.
+4. Ordena las especies por la media del índice de masa corporal de manera descendente.
+
+5. Realiza un diagrama de barras de la media del índice de masa corporal por especie.
+
+
+### Datos covid México
+
+1. Cargar Datos y Explorar:
+- Carga el conjunto de datos proporcionado.
+- Muestra las primeras filas para entender su estructura.
+2. Filtrado y Resumen:
+- Filtra los datos para incluir solo los casos de mujeres mayores de 30 años con diabetes.
+- Calcula la cantidad total de casos y la edad promedio de este grupo.
+3. Gráfica de Barras:
+- Crea un gráfico de barras que muestre la cantidad de casos por sector.
+4. Análisis Temporal:
+- Convierte la columna de fechas a formato de fecha.
+- Filtra los datos para incluir solo los casos desde el 1 de enero de 2020 hasta el 31 de diciembre de 2021.
+- Crea una gráfica de líneas que muestre la evolución diaria de casos en ese periodo.
+- Estima el $R_0$ y $R_t$
