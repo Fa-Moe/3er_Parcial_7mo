@@ -257,6 +257,16 @@ El medicamento estándar para el tratamiento de la oncocercosis es la ivermectin
 
 Escibe un conjunto de ecuaciones diferenciales que describan esa situación. Justifica tus respuestas describiendo con detalle tus ecuaciones y supuestos asumidos. Resuelve tu sistema en R.
 
+$S_V$ son los vectores susceptibles
+$I_V$ son los vectores infectados
+$S_H$ son los humanos susceptibles
+$I_H$ son los humanos infectados
+$I_{HT}$ son los humanos infectados y tratados
+
+El modelo asume que las personas cercanas y lejanas a los ríos son tratados a la misma tasa, que la infección cerca o lejos del río sigue el mismo curso, que la reducción en interacción de las personas lejanas es una constante (no decae con la distancia, solo es diferente a partir de un umbral), que la proporción de personas cerca y lejos de los rios permanece constante, no considera la actividad nocturna o diurna de los vectores. Considera Betas distintas de infección a vectores y a humanos, y solo permite tratamiento hasta un umbral.
+
+
+
 $$ \dot S_V= \mu(S_V+I_V)
 -          m\beta_VS_VI_H
 -(1-m)\alpha\beta_VS_VI_H
@@ -307,54 +317,103 @@ $$ \dot I_{HT}=(p-I_{HT})I_H
 
 
 ```{r, cache = TRUE}
-beta1 <- 0.2
-beta2 <- 0.05
-gamma <- 0.3
-r <- 0.75
-delta <- 0.9
+mu <- 1/21
+betav<- 0.01
+m <- 0.25
+alpha <- 0.1
+t <- 0.01
+eta <- 1/365
+betah<- 0.08
+p <- 0.3
 
 
 library(deSolve)
-modeloDirectoeIndirecto <- function(t, state, parameters){
+modelomosca <- function(t, state, parameters){
   with(as.list(c(state, parameters)), {
-  dS <- - beta1*S*I - beta2*S*B 
-  dI <- + beta1*S*I + beta2*S*B - gamma*I 
-  dR <-                           gamma*I 
-  dB <- r*I-delta*B
-    list(c(dS,dI,dR,dB))
+  dSv <- mu*(Sv+Iv)-m*betav*Sv*Ih-(1-m)*alpha*betav*Sv*Ih- m*t*betav*Sv*Iht- (1-m)*alpha*t*betav*Sv*Iht-mu*Sv
+  dIv <-           +m*betav*Sv*Ih+(1-m)*alpha*betav*Sv*Ih+ m*t*betav*Sv*Iht+ (1-m)*alpha*t*betav*Sv*Iht-mu*Iv 
+  dSh <- eta*(Sh+Ih+Iht)- m*betah*Sh*Iv-(1-m)*alpha*betah*Sh*Iv            - eta*Sh
+  dIh <-                + m*betah*Sh*Iv+(1-m)*alpha*betah*Sh*Iv -(p-Iht)*Ih - eta*Ih
+  dIht<-                                                        +(p-Iht)*Ih - eta*Iht
+    list(c(dSv,dIv,dSh,dIh,dIht))
   })
 }
-pars <- c(beta1, beta2, gamma, r, delta)
-tiempo <- seq(0,50, by = 0.01)
+pars <- c(mu, betav, m, alpha, t, eta, betah, p)
+tiempo <- seq(0,250, by = 0.1)
 
 library(colorspace)
-condiciones_iniciales <- c(S=0.95,I=0.05,R=0,B=0)
-out <- ode(condiciones_iniciales, tiempo, modeloDirectoeIndirecto, pars)
-matplot(out[ , 1], out [ , 2:5], type = "l", xlab = "tiempo", ylab = "Poblacion o carga parasitaria/grado de contaminacion", ylim=c(0,1),
-        main = "modeloDirectoeIndirecto, R0=0.805",col = c("#FD4235","#CC53CC","#41521F","#E9C46A"), lwd = 2,lty=1)
-        legend("topright", c("S", "I", "R","B"), col = c("#FD4235","#CC53CC","#41521F","#E9C46A"), lwd = 4,lty=1, cex=0.75)
+condiciones_iniciales <- c(Sv=0.9,Iv=0.1,Sh=0.9,Ih=0.05,Iht=0.05)
+out <- ode(condiciones_iniciales, tiempo, modelomosca, pars)
+matplot(out[ , 1], out [ , 2:6], type = "l", xlab = "tiempo", ylab = "Poblacion", ylim=c(0,1),
+        main = "modelomosca",col = c("#FD4235","#CC53CC","#41521F","#E9C46A","#4281A4"), lwd = 2,lty=1)
+        legend("topright", c("Sv", "Iv", "Sh","Ih","Iht"), col = c("#FD4235","#CC53CC","#41521F","#E9C46A","#4281A4"), lwd = 4,lty=1, cex=0.75)
 ```
 
-
+La mayoría de personas y vectores se infecta al final. Al inicio casi todos los infectados se tratan y así no hay un decaimiento rápido de los susceptibles pero se alcanza un punto de saturacion de tratamiento, suben los infectados rápidamente y los susceptibles decaen de igual manera.
 
 ## Tydiverse
 Utiliza la librería `palmerpenguins` par el siguiente problema. Carga los datos, incluidos en esa librería, `penguins` a partir de ello escribe un script en R qu resuelva lo siguiente:
 
+```{r, cache = TRUE}
+library(dplyr)
+library(palmerpenguins)
+Datos_pingu <- palmerpenguins::penguins
+
+```
+
  1. Filtra los pingüinos que pertenecen a la especie "Adelie" y tienen un peso corporal mayor a 3500 gramos.
+ 
+```{r, cache = TRUE}
+
+glimpse(Datos_pingu)
+Filtrado1 <- Datos_pingu %>% filter(species=="Adelie"&body_mass_g>3500)
+glimpse(Filtrado1)
+```
+ 
 2. Crea una nueva columna llamada "bmi" (Body Mass Index) que represente el índice de masa corporal usando la fórmula: 
-$$ BMI = peso (kg) / (altura (m))^2$$. 
+$$ BMI = peso (kg) / (altura (m))^2$$.
 La altura está representada en centímetros en la base de datos, así que conviértela a metros.
 
+```{r, cache = TRUE}
+Pingu_BMI <- Datos_pingu %>%
+             filter_at(vars(body_mass_g, flipper_length_mm), all_vars(!is.na(.))) %>%
+             mutate(BMI=(body_mass_g/1000) / (flipper_length_mm*2.3/1000)^2) 
+#Consideré que la altura es igual a ~2.3 veces la longitud de la aleta del pinguino, estimado a ojo de imagenes de internet.
+glimpse(Pingu_BMI)
+```
+
 3. Agrupa los datos por la especie y calcula la media del índice de masa corporal (bmi) para cada especie.
+
+```{r, cache = TRUE}
+Pingu_BMI <- Pingu_BMI %>% group_by(species) 
+Resumen_BMI <- Pingu_BMI %>% summarise(avg = mean(BMI))
+Resumen_BMI
+```
+
 4. Ordena las especies por la media del índice de masa corporal de manera descendente.
+
+```{r, cache = TRUE}
+Pingu_BMI <- Pingu_BMI %>% arrange(factor(species, levels = c("Gentoo","Adelie","Chinstrap")))
+glimpse(Pingu_BMI)
+```
 
 5. Realiza un diagrama de barras de la media del índice de masa corporal por especie.
 
+```{r, cache = TRUE}
+Nombres<-Pingu_BMI %>% select(species) %>% unique() %>% unlist()
+barplot(rev(sort(unlist(Resumen_BMI)[4:6]))~Nombres,ylim=c(15,21),xpd=FALSE,col=c("lightyellow","lightgreen","lightblue"))
+box(bty="l")
+```
 
 ### Datos covid México
 
 1. Cargar Datos y Explorar:
 - Carga el conjunto de datos proporcionado.
+
+```{r, cache = TRUE}
+
+```
+
 - Muestra las primeras filas para entender su estructura.
 2. Filtrado y Resumen:
 - Filtra los datos para incluir solo los casos de mujeres mayores de 30 años con diabetes.
