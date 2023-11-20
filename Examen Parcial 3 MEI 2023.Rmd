@@ -154,15 +154,33 @@ con $N=S+I+R$
 
 -   Dibuja un esquema por compartimentos de este modelo
 -   Justifica porque es un buen sistema de ecuaciones para describir el problema
+
+Es bueno debido a que separa las betas debido a que la interacción con un infectado no es la misma (carga bacteriana alta y bacterias activas) que con bacterias del ambiente que pueden estar en un estado menos óptimo para infectar (debido al estrés del ambiente) y que la carga con la que se inocula el susceptible sea menor. Además de ello, la carga ambiental considera que  hay un mecanismo general por el cual las bacterias mueren fuera del cuerpo dada $\delta$. Sólo se podría mejorar si se añade demografía, y tal vez añadir términos que consideraran la toma preferencial de fuentes de agua limpia a de agua contaminada (hasta cierto umbral donde no hay fuentes de agua limpia para todos).
+
 -   Justifica porque la siguiente expresión puede ser un buen $R_0=\frac{\beta_1 N}{\gamma} +\frac{r\beta_2 N}{\gamma \delta}$
+
+Es un buen R0 debido a que suma los infectados causados mediante los 2 tipos de interacción (sería un error por ejemplo multiplicar $beta_1$ por $beta_2$). Además de ello, $beta_1$ contribuye negativamente solo a la parte de $beta_2$ (seria otro error que $\delta$ dividiera a $beta_1$). de igual manera $r$ solo afecta a la contribución de $beta_2$. Sin embargo, incluir la $N$ como multiplicador de ambas es inadecuado, ya que los resistentes no favorecen la dinámica de infección. $R_0$ no consideraría los niveles poblacionales de susceptibles e infectados, si fuese $R_t$ entonces podría añadirse un término con N para modelar la población de susceptibles y como beneficia a la dinámica de infección (al término I). 
+
 -   Resuelve numéricamente este sistema en R para valores de $R_0 >1$ y $R_0 <1$ Discute tus resultados.
 
+con $S+I+R=N=1$
+
+$R_0=\beta_1/\gamma+r\beta_2/\gamma\delta$
+
+con $\beta_1=0.5;\beta_2=0.25;\gamma=0.1;r=0.5;\delta=0.9$
+
+$R_0=0.5/0.1+(0.25*0.5)/(0.1*0.9)$
+
+$R_0=5+1.38$
+
+$R_0=6.38$
+
 ```{r, cache = TRUE}
-beta1 <- 1/75
-beta2 <- 0.3
-gamma <- 0.86
-r <- 1/14
-delta <- 0.2
+beta1 <- 0.5
+beta2 <- 0.25
+gamma <- 0.1
+r <- 0.5
+delta <- 0.9
 
 
 library(deSolve)
@@ -179,13 +197,54 @@ pars <- c(beta1, beta2, gamma, r, delta)
 tiempo <- seq(0,50, by = 0.01)
 
 library(colorspace)
-condiciones_iniciales <- c(S=0.9,I=0.1,R=0,B=0)
+condiciones_iniciales <- c(S=0.95,I=0.05,R=0,B=0)
 out <- ode(condiciones_iniciales, tiempo, modeloDirectoeIndirecto, pars)
 matplot(out[ , 1], out [ , 2:5], type = "l", xlab = "tiempo", ylab = "Poblacion o carga parasitaria/grado de contaminacion", ylim=c(0,1),
-        main = "modeloDirectoeIndirecto",col = c("#FD4235","#CC53CC","#41521F","#E9C46A"), lwd = 2,lty=1)
+        main = "modeloDirectoeIndirecto, R0=6.38",col = c("#FD4235","#CC53CC","#41521F","#E9C46A"), lwd = 2,lty=1)
         legend("topright", c("S", "I", "R","B"), col = c("#FD4235","#CC53CC","#41521F","#E9C46A"), lwd = 4,lty=1, cex=0.75)
 ```
 
+En un inicio hay crecimiento exponencial de los infectados y vemos una curva epidémica normal en la que caen los susceptibles y los recuperados crecen hasta que se alcanza inmunidad de rebaño (herd-immunity) por lo que los infectados vuelven a caer a un punto free-disease (en este caso, free disease es estable porque la inmunidad es de por vida y no hay nacimiento de susceptibles). Además vemos que coincide un pico de bacterias ambientales con el pico de infectados.
+
+
+con $\beta_1=0.2;\beta_2=0.05;r=0.75;\gamma=0.3;\delta=0.9$
+
+$R_0=0.2/0.3+(0.05*0.75)/(0.3*0.9)$
+
+$R_0=0.666+0.138$
+
+$R_0=0.805$
+
+```{r, cache = TRUE}
+beta1 <- 0.2
+beta2 <- 0.05
+gamma <- 0.3
+r <- 0.75
+delta <- 0.9
+
+
+library(deSolve)
+modeloDirectoeIndirecto <- function(t, state, parameters){
+  with(as.list(c(state, parameters)), {
+  dS <- - beta1*S*I - beta2*S*B 
+  dI <- + beta1*S*I + beta2*S*B - gamma*I 
+  dR <-                           gamma*I 
+  dB <- r*I-delta*B
+    list(c(dS,dI,dR,dB))
+  })
+}
+pars <- c(beta1, beta2, gamma, r, delta)
+tiempo <- seq(0,50, by = 0.01)
+
+library(colorspace)
+condiciones_iniciales <- c(S=0.95,I=0.05,R=0,B=0)
+out <- ode(condiciones_iniciales, tiempo, modeloDirectoeIndirecto, pars)
+matplot(out[ , 1], out [ , 2:5], type = "l", xlab = "tiempo", ylab = "Poblacion o carga parasitaria/grado de contaminacion", ylim=c(0,1),
+        main = "modeloDirectoeIndirecto, R0=0.805",col = c("#FD4235","#CC53CC","#41521F","#E9C46A"), lwd = 2,lty=1)
+        legend("topright", c("S", "I", "R","B"), col = c("#FD4235","#CC53CC","#41521F","#E9C46A"), lwd = 4,lty=1, cex=0.75)
+```
+
+En este caso los infectados (5% de la poblacion inicial) no logran incrementar sus números e infectan únicamente a unos cuantos susceptibles, y pasan todos a recuperarse sin observar un pico de crecimiento de infectados (no hay curva epidémica). El nivel de bacterias en el ambiente siempre se mantiene bajo. La mayoría de personas nunca se infecta y la enfermedad desaparece de la población después de un tiempo. 
 
 
 ## Enfermedades transmitidas por vectores
@@ -197,6 +256,13 @@ La hora pico de picadura de las moscas negras es durante las horas diurnas, y la
 El medicamento estándar para el tratamiento de la oncocercosis es la ivermectina; la administración oral mata las larvas rápidamente pero no mata a los gusanos adultos. Sin embargo, reduce su tasa reproductiva durante varios meses. El tratamiento con ivermectina está disponible para una fracción $p$ de la población, limitada por restricciones sobre quiénes pueden recibir la medicación, atención médica limitada y disposición a participar.
 
 Escibe un conjunto de ecuaciones diferenciales que describan esa situación. Justifica tus respuestas describiendo con detalle tus ecuaciones y supuestos asumidos. Resuelve tu sistema en R.
+
+$$ \dot L_e= -\beta_1SI -\beta_2 SB$$
+
+$$ \dot L_m= -\beta_1SI -\beta_2 SB$$
+
+$$ \dot L_h= -\beta_1SI -\beta_2 SB$$
+$$ \dot L_a= mad_aL_h*$$
 
 ## Tydiverse
 Utiliza la librería `palmerpenguins` par el siguiente problema. Carga los datos, incluidos en esa librería, `penguins` a partir de ello escribe un script en R qu resuelva lo siguiente:
