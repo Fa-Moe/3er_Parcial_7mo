@@ -1,6 +1,6 @@
 ---
 title: "Examen Parcial 3 Modelaje de Enfermedades Infecciosas 2023"
-author: "Roberto Álvarez"
+author: "Francisco Farell Moedano Vargas"
 date: "`r Sys.Date()`"
 output: html_document
 ---
@@ -9,33 +9,136 @@ output: html_document
 
 Considera una enfermedad infecciosa impulsada por factores ambientales, como el cólera y la toxoplasmosis (una enfermedad parasitaria causada por T. *gondii*). Para este tipo de enfermedad, la transmisión ocurre cuando los huéspedes susceptibles tienen contacto con un entorno contaminado, y la tasa de contaminación del entorno depende tanto del número de huéspedes infectados como de la carga patógena promedio dentro de un huésped infectado. Una forma de modelar la dinámica de transmisión para tal enfermedad es considerar tanto la transmisión de la enfermedad a nivel de la población como el proceso de infección dentro de los huéspedes.
 
-$$\dot T_1 = \Lambda -kVT_1 -mT$$
-$$\dot T_2= kVT -(m+d)T_2$$
+$$\dot T_1 = \Lambda -kVT_1 -mT_1$$
+$$\dot T_2= kVT_1 -(m+d)T_2$$
 $$ \dot V= g(E) +pT_2-cV$$
 $$ \dot S= \mu(S+I) -\lambda ES -\mu S$$
 $$\dot I =\lambda ES -\mu I$$
 
-$$ \dot E= \theta(V)I(1-E) -\gamma E$$
+  $$ \dot E= \theta(V)I(1-E) -\gamma E$$
 
 
 Con, las variables $T_1,T_2, V$  son las densidades de células sanas, infectadas y carga parasitaria respectivamente.
 
 -   Dibuja un esquema por compartimentos de este modelo
-- Describe el resto de las ecuaciones y parámetros.¿Qué son $g(E)$  y $\theta(V)$ ?
-- Justifica porque es un buen sistema de ecuaciones para describir el problema
+-   Describe el resto de las ecuaciones y parámetros.¿Qué son $g(E)$  y $\theta(V)$ ?
+
+$\Lambda$ es la tasa a la que nacen celulas sanas,
+
+$-kVT_1$ modela el paso de celulas sanas a infectadas debido a la carga parasitaria presente en la persona, modificado por una tasa $k$ que es la efectividad con la que el parásito infecta nuevas células,
+
+$-mT_1$ es la muerte de las celulas sanas,
+
+$-(m+d)T_2$ es la muerte de las células infectadas data una mortalidad basal de las células $m$ y muerte excedente debido a que están enfermas $d$,
+
+$g(E)$ es un término que modela como el grado de contaminación del entorno impacta la carga parasitaria de la persona promedio, con una dinámica no descrita (podría ser que por ejemplo $g(E) = E*constante$)
+
+$pT_2$ es la aportación de las células infectadas a la carga parasitaria promedio de los individuos, modificada por una tasa $p$ que podría ser la tasa a la que las células infectadas producen nuevos parásitos.
+
+$-cV$ es la disminución de carga parasitaria a la tasa $c$ que podría describir la tasa a la cual el sistema inmune elimina los parásitos del cuerpo.
+
+$\mu(S+I)$ describe un aumento en la natalidad de personas (que siempre nacen sanas, no hay transmisión vertical) dada la muerte de los infectados y susceptibles 
+(reemplazo por natalidad de los muertos).
+
+$-\lambdaES$ es el paso de personas susceptibles a infectadas dada la interacción de una persona con su entorno (que está contaminado a cierto grado) y está modificado por una tasa $\lambda$ que se puede interpretar como la efectividad con la que el patógeno puede invadir el cuerpo desde el entorno.
+
+$-\mu S$ es la muerte de los susceptibles,
+
+$-\mu I$ es la muerte de los infectados,
+
+$\theta(V)I(1-E)$ es la manera en la que la carga parasitaria promedio (dada una dinámica no descrita, podría ser que $\theta(V)=V*constante$) de los infectados $I$ aporta a la contaminación del entorno, siendo que la máxima contaminación del entorno es 1 ($(1-E)$ evita que se pase arriba de ese valor), 
+
+$-\gamma E$ es la tasa a la cual el entorno se auto-descontamina dada una tasa $\gamma$ que podría interpretarse como la tasa a la que se limpia el entorno o a la cual mueren los parásitos que están fuera del cuerpo. 
+-   Justifica porque es un buen sistema de ecuaciones para describir el problema.
+
+Es un bueno modelo debido a que considera que al inicio los infectados no son igual de infectivos (baja carga parasitaria) que después de un periodo con la infección (alta carga parasitaria). Además de ello, modela la adquisición de parásitos desde el ambiente de una manera simple tomando en cuenta la contaminación con parásitos provenientes de las personas infectadas (y considera su carga parasitaria). Considera tanto poblaciones de células saludables como de infectadas, por lo que es un modelo mixto entre nivel individual y poblacional. La parte de nivel individual da un mayor respaldo y una explicación biológica plausible para la proyección poblacional, y considera de manera integral el proceso infectivo. 
+
 -   Resuelve numéricamente este sistema en R.
+
+con $g(E)=E$ y $\theta(V)=V$
+
+```{r, cache = TRUE}
+mlambda <- 0.1
+k <- 0.6
+m <- 0.05
+d <- 0.1
+p <- 0.4
+c <- 0.9
+mu <- 0.03
+lambda <- 0.6
+gamma <- 0.9
+
+
+library(deSolve)
+modeloAmbiental <- function(t, state, parameters){
+  with(as.list(c(state, parameters)), {
+  dT1 <- mlambda - k*V*T1 - m*T1
+  dT2 <-           k*V*T1 - (m+d)*T2
+  dV  <- E + p*T2         - c*V
+  dS  <- mu*(S+I) - lambda*E*S - mu*S
+  dI  <-           lambda*E*S - mu*I
+  dE  <- V*I*(1-E) - gamma*E
+    list(c(dT1,dT2,dV,dS,dI,dE))
+  })
+}
+pars <- c(mlambda, k, m, d, p, c, mu, lambda, gamma)
+tiempo <- seq(0,50, by = 0.01)
+
+library(colorspace)
+condiciones_iniciales <- c(T1=0.9,T2=0.1,V=0.1,S=0.9,I=0.1,E=0.1)
+out <- ode(condiciones_iniciales, tiempo, modeloAmbiental, pars)
+matplot(out[ , 1], out [ , 2:7], type = "l", xlab = "tiempo", ylab = "Poblacion o carga parasitaria/grado de contaminacion", ylim=c(0,1),
+        main = "modeloAmbiental",col = c("#FD4235","#CC53CC","#41521F","#E9C46A","#4281A4","green"), lwd = 2,lty=1)
+        legend("topright", c("T1", "T2", "V","S","I","E"), col = c("#FD4235","#CC53CC","#41521F","#E9C46A","#4281A4","green"), lwd = 4,lty=1, cex=0.75)
+```
+
 
 ## Vacunación y valor umbral
 
 Considera una población en la cual una fracción $p \in (0, 1 )$ de los recién nacidos son exitosamente vacunados y asume inmunidad permanente después de la infección y la vacunación. Supongamos que los individuos infecciosos son tratados a una tasa per cápita $r$. Sea $R_c$ el número de reproducción de control tal que el equilibrio libre de enfermedad es asintóticamente estable cuando $R_c < 1$. Considera una enfermedad para la cual $\beta = 0.86$, $\gamma = 1/14$ $días^{-1}$, $\mu = 1/75$ $años^{−1}$. Usa el siguiente modelo SIR para calcular el nivel de inmunidad umbral $p_c$ tal que $R_c < 1$ para $p > p_c$.
 
-$$\dot S = \mu N(1-p)-\beta S\frac{I}{N} -\mu S$$ $$\dot I = \beta S\frac{I}{N} -(\gamma  +\mu +r) I$$ $$\dot R =\mu N p +(\gamma + r)I-\mu R$$ con $$N=S+I+R$$
+$$\dot S = \mu N(1-p)-\beta S\frac{I}{N} -\mu S$$ 
+$$\dot I = \beta S\frac{I}{N} -(\gamma  +\mu +r) I$$ 
+$$\dot R =\mu N p +(\gamma + r)I-\mu R$$ con 
+
+$$N=S+I+R$$
 
 -   Dibuja un esquema por compartimentos de este modelo
-- Justifica porque es un buen sistema de ecuaciones para describir el problema
+-   Justifica porque es un buen sistema de ecuaciones para describir el problema
+
+Es un modelo adecuado para enfermedades que generan inmunidad prácticamente de por vida y tienen una vacuna disponible. Tiene en cuenta la demografía de tal manera que se conserva la población (toma en cuenta para la matalidad la muerte de la población en total). Además de ello, toma en cuenta la tasa a la que se tratan con fármacos los infectados. En resumen es un modelo SIR con consideraciones extra como la vacunación, y por ello resulta increíblemente útil para fijar objetivos de vacunación, tanto en regiones que tienen tratamiento disponible como en las que no. 
+
 -   Encuentra $p_c$ en ausencia de tratamiento ($r=0$)
 -   Encuentra $p_c$ con $r=0.2$
 -   Resuelve numéricamente este sistema en R.
+
+```{r, cache = TRUE}
+mu <- 1/75
+p <- 0.3
+beta <- 0.86
+gamma <- 1/14
+r <- 0.2
+
+
+library(deSolve)
+modeloVacuna <- function(t, state, parameters){
+  with(as.list(c(state, parameters)), {
+  dS <- mu*(S+I+R)*(1-p) - beta*S*I*1/(S+I+R) - mu*S
+  dI <-                    beta*S*I*1/(S+I+R) - (gamma+mu+r)*I
+  dR <- mu*(S+I+R)*(p)                        + (gamma+r)*I - mu*R
+    list(c(dS,dI,dR))
+  })
+}
+pars <- c(mu, p, beta, gamma, r)
+tiempo <- seq(0,50, by = 0.01)
+
+library(colorspace)
+condiciones_iniciales <- c(S=0.9,I=0.1,R=0)
+out <- ode(condiciones_iniciales, tiempo, modeloVacuna, pars)
+matplot(out[ , 1], out [ , 2:4], type = "l", xlab = "tiempo", ylab = "Poblacion o carga parasitaria/grado de contaminacion", ylim=c(0,1),
+        main = "modeloVacuna",col = c("#FD4235","#CC53CC","#41521F"), lwd = 2,lty=1)
+        legend("topright", c("S", "I", "R"), col = c("#FD4235","#CC53CC","#41521F"), lwd = 4,lty=1, cex=0.75)
+```
 
 ## Modelos de transmisón directa e indirecta
 
@@ -53,6 +156,37 @@ con $N=S+I+R$
 -   Justifica porque es un buen sistema de ecuaciones para describir el problema
 -   Justifica porque la siguiente expresión puede ser un buen $R_0=\frac{\beta_1 N}{\gamma} +\frac{r\beta_2 N}{\gamma \delta}$
 -   Resuelve numéricamente este sistema en R para valores de $R_0 >1$ y $R_0 <1$ Discute tus resultados.
+
+```{r, cache = TRUE}
+beta1 <- 1/75
+beta2 <- 0.3
+gamma <- 0.86
+r <- 1/14
+delta <- 0.2
+
+
+library(deSolve)
+modeloDirectoeIndirecto <- function(t, state, parameters){
+  with(as.list(c(state, parameters)), {
+  dS <- - beta1*S*I - beta2*S*B 
+  dI <- + beta1*S*I + beta2*S*B - gamma*I 
+  dR <-                           gamma*I 
+  dB <- r*I-delta*B
+    list(c(dS,dI,dR,dB))
+  })
+}
+pars <- c(beta1, beta2, gamma, r, delta)
+tiempo <- seq(0,50, by = 0.01)
+
+library(colorspace)
+condiciones_iniciales <- c(S=0.9,I=0.1,R=0,B=0)
+out <- ode(condiciones_iniciales, tiempo, modeloDirectoeIndirecto, pars)
+matplot(out[ , 1], out [ , 2:5], type = "l", xlab = "tiempo", ylab = "Poblacion o carga parasitaria/grado de contaminacion", ylim=c(0,1),
+        main = "modeloDirectoeIndirecto",col = c("#FD4235","#CC53CC","#41521F","#E9C46A"), lwd = 2,lty=1)
+        legend("topright", c("S", "I", "R","B"), col = c("#FD4235","#CC53CC","#41521F","#E9C46A"), lwd = 4,lty=1, cex=0.75)
+```
+
+
 
 ## Enfermedades transmitidas por vectores
 
