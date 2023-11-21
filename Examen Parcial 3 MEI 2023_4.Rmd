@@ -3,55 +3,101 @@ title: "Examen Parcial 3 Modelaje de Enfermedades Infecciosas 2023"
 author: "Francisco Farell Moedano Vargas"
 date: "`r Sys.Date()`"
 output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 ## Enfermedad infecciosa determinada por el ambiente
 
-Considera una enfermedad infecciosa impulsada por factores ambientales, como el cólera y la toxoplasmosis (una enfermedad parasitaria causada por T. *gondii*). Para este tipo de enfermedad, la transmisión ocurre cuando los huéspedes susceptibles tienen contacto con un entorno contaminado, y la tasa de contaminación del entorno depende tanto del número de huéspedes infectados como de la carga patógena promedio dentro de un huésped infectado. Una forma de modelar la dinámica de transmisión para tal enfermedad es considerar tanto la transmisión de la enfermedad a nivel de la población como el proceso de infección dentro de los huéspedes.
+Considera una enfermedad infecciosa impulsada por factores ambientales,
+como el cólera y la toxoplasmosis (una enfermedad parasitaria causada
+por T. *gondii*). Para este tipo de enfermedad, la transmisión ocurre
+cuando los huéspedes susceptibles tienen contacto con un entorno
+contaminado, y la tasa de contaminación del entorno depende tanto del
+número de huéspedes infectados como de la carga patógena promedio dentro
+de un huésped infectado. Una forma de modelar la dinámica de transmisión
+para tal enfermedad es considerar tanto la transmisión de la enfermedad
+a nivel de la población como el proceso de infección dentro de los
+huéspedes.
 
-$$\dot T_1 = \Lambda -kVT_1 -mT_1$$
-$$\dot T_2= kVT_1 -(m+d)T_2$$
-$$ \dot V= g(E) +pT_2-cV$$
-$$ \dot S= \mu(S+I) -\lambda ES -\mu S$$
+$$\dot T_1 = \Lambda -kVT_1 -mT_1$$ $$\dot T_2= kVT_1 -(m+d)T_2$$
+$$ \dot V= g(E) +pT_2-cV$$ $$ \dot S= \mu(S+I) -\lambda ES -\mu S$$
 $$\dot I =\lambda ES -\mu I$$
 
-  $$ \dot E= \theta(V)I(1-E) -\gamma E$$
+$$ \dot E= \theta(V)I(1-E) -\gamma E$$
 
-
-Con, las variables $T_1,T_2, V$  son las densidades de células sanas, infectadas y carga parasitaria respectivamente.
+Con, las variables $T_1,T_2, V$ son las densidades de células sanas,
+infectadas y carga parasitaria respectivamente.
 
 -   Dibuja un esquema por compartimentos de este modelo
--   Describe el resto de las ecuaciones y parámetros.¿Qué son $g(E)$  y $\theta(V)$ ?
+
+![](a.jpeg)
+
+-   Describe el resto de las ecuaciones y parámetros.¿Qué son $g(E)$ y
+    $\theta(V)$ ?
 
 $\Lambda$ es la tasa a la que nacen celulas sanas,
 
-$-kVT_1$ modela el paso de celulas sanas a infectadas debido a la carga parasitaria presente en la persona, modificado por una tasa $k$ que es la efectividad con la que el parásito infecta nuevas células,
+$-kVT_1$ modela el paso de celulas sanas a infectadas debido a la carga
+parasitaria presente en la persona, modificado por una tasa $k$ que es
+la efectividad con la que el parásito infecta nuevas células,
 
 $-mT_1$ es la muerte de las celulas sanas,
 
-$-(m+d)T_2$ es la muerte de las células infectadas data una mortalidad basal de las células $m$ y muerte excedente debido a que están enfermas $d$,
+$-(m+d)T_2$ es la muerte de las células infectadas data una mortalidad
+basal de las células $m$ y muerte excedente debido a que están enfermas
+$d$,
 
-$g(E)$ es un término que modela como el grado de contaminación del entorno impacta la carga parasitaria de la persona promedio, con una dinámica no descrita (podría ser que por ejemplo $g(E) = E*constante$)
+$g(E)$ es un término que modela como el grado de contaminación del
+entorno impacta la carga parasitaria de la persona promedio, con una
+dinámica no descrita (podría ser que por ejemplo $g(E) = E*constante$)
 
-$pT_2$ es la aportación de las células infectadas a la carga parasitaria promedio de los individuos, modificada por una tasa $p$ que podría ser la tasa a la que las células infectadas producen nuevos parásitos.
+$pT_2$ es la aportación de las células infectadas a la carga parasitaria
+promedio de los individuos, modificada por una tasa $p$ que podría ser
+la tasa a la que las células infectadas producen nuevos parásitos.
 
-$-cV$ es la disminución de carga parasitaria a la tasa $c$ que podría describir la tasa a la cual el sistema inmune elimina los parásitos del cuerpo.
+$-cV$ es la disminución de carga parasitaria a la tasa $c$ que podría
+describir la tasa a la cual el sistema inmune elimina los parásitos del
+cuerpo.
 
-$\mu(S+I)$ describe un aumento en la natalidad de personas (que siempre nacen sanas, no hay transmisión vertical) dada la muerte de los infectados y susceptibles 
-(reemplazo por natalidad de los muertos).
+$\mu(S+I)$ describe un aumento en la natalidad de personas (que siempre
+nacen sanas, no hay transmisión vertical) dada la muerte de los
+infectados y susceptibles (reemplazo por natalidad de los muertos).
 
-$-\lambdaES$ es el paso de personas susceptibles a infectadas dada la interacción de una persona con su entorno (que está contaminado a cierto grado) y está modificado por una tasa $\lambda$ que se puede interpretar como la efectividad con la que el patógeno puede invadir el cuerpo desde el entorno.
+$-\lambdaES$ es el paso de personas susceptibles a infectadas dada la
+interacción de una persona con su entorno (que está contaminado a cierto
+grado) y está modificado por una tasa $\lambda$ que se puede interpretar
+como la efectividad con la que el patógeno puede invadir el cuerpo desde
+el entorno.
 
 $-\mu S$ es la muerte de los susceptibles,
 
 $-\mu I$ es la muerte de los infectados,
 
-$\theta(V)I(1-E)$ es la manera en la que la carga parasitaria promedio (dada una dinámica no descrita, podría ser que $\theta(V)=V*constante$) de los infectados $I$ aporta a la contaminación del entorno, siendo que la máxima contaminación del entorno es 1 ($(1-E)$ evita que se pase arriba de ese valor), 
+$\theta(V)I(1-E)$ es la manera en la que la carga parasitaria promedio
+(dada una dinámica no descrita, podría ser que $\theta(V)=V*constante$)
+de los infectados $I$ aporta a la contaminación del entorno, siendo que
+la máxima contaminación del entorno es 1 ($(1-E)$ evita que se pase
+arriba de ese valor),
 
-$-\gamma E$ es la tasa a la cual el entorno se auto-descontamina dada una tasa $\gamma$ que podría interpretarse como la tasa a la que se limpia el entorno o a la cual mueren los parásitos que están fuera del cuerpo. 
--   Justifica porque es un buen sistema de ecuaciones para describir el problema.
+$-\gamma E$ es la tasa a la cual el entorno se auto-descontamina dada
+una tasa $\gamma$ que podría interpretarse como la tasa a la que se
+limpia el entorno o a la cual mueren los parásitos que están fuera del
+cuerpo. - Justifica porque es un buen sistema de ecuaciones para
+describir el problema.
 
-Es un bueno modelo debido a que considera que al inicio los infectados no son igual de infectivos (baja carga parasitaria) que después de un periodo con la infección (alta carga parasitaria). Además de ello, modela la adquisición de parásitos desde el ambiente de una manera simple tomando en cuenta la contaminación con parásitos provenientes de las personas infectadas (y considera su carga parasitaria). Considera tanto poblaciones de células saludables como de infectadas, por lo que es un modelo mixto entre nivel individual y poblacional. La parte de nivel individual da un mayor respaldo y una explicación biológica plausible para la proyección poblacional, y considera de manera integral el proceso infectivo. 
+Es un bueno modelo debido a que considera que al inicio los infectados
+no son igual de infectivos (baja carga parasitaria) que después de un
+periodo con la infección (alta carga parasitaria). Además de ello,
+modela la adquisición de parásitos desde el ambiente de una manera
+simple tomando en cuenta la contaminación con parásitos provenientes de
+las personas infectadas (y considera su carga parasitaria). Considera
+tanto poblaciones de células saludables como de infectadas, por lo que
+es un modelo mixto entre nivel individual y poblacional. La parte de
+nivel individual da un mayor respaldo y una explicación biológica
+plausible para la proyección poblacional, y considera de manera integral
+el proceso infectivo.
 
 -   Resuelve numéricamente este sistema en R.
 
@@ -92,29 +138,58 @@ matplot(out[ , 1], out [ , 2:7], type = "l", xlab = "tiempo", ylab = "Poblacion 
         legend("topright", c("T1", "T2", "V","S","I","E"), col = c("#FD4235","#CC53CC","#41521F","#E9C46A","#4281A4","green"), lwd = 4,lty=1, cex=0.75)
 ```
 
-
 ## Vacunación y valor umbral
 
-Considera una población en la cual una fracción $p \in (0, 1 )$ de los recién nacidos son exitosamente vacunados y asume inmunidad permanente después de la infección y la vacunación. Supongamos que los individuos infecciosos son tratados a una tasa per cápita $r$. Sea $R_c$ el número de reproducción de control tal que el equilibrio libre de enfermedad es asintóticamente estable cuando $R_c < 1$. Considera una enfermedad para la cual $\beta = 0.86$, $\gamma = 1/14$ $días^{-1}$, $\mu = 1/75$ $años^{−1}$. Usa el siguiente modelo SIR para calcular el nivel de inmunidad umbral $p_c$ tal que $R_c < 1$ para $p > p_c$.
+Considera una población en la cual una fracción $p \in (0, 1 )$ de los
+recién nacidos son exitosamente vacunados y asume inmunidad permanente
+después de la infección y la vacunación. Supongamos que los individuos
+infecciosos son tratados a una tasa per cápita $r$. Sea $R_c$ el número
+de reproducción de control tal que el equilibrio libre de enfermedad es
+asintóticamente estable cuando $R_c < 1$. Considera una enfermedad para
+la cual $\beta = 0.86$, $\gamma = 1/14$ $días^{-1}$, $\mu = 1/75$
+$años^{−1}$. Usa el siguiente modelo SIR para calcular el nivel de
+inmunidad umbral $p_c$ tal que $R_c < 1$ para $p > p_c$.
 
-$$\dot S = \mu N(1-p)-\beta S\frac{I}{N} -\mu S$$ 
-$$\dot I = \beta S\frac{I}{N} -(\gamma  +\mu +r) I$$ 
-$$\dot R =\mu N p +(\gamma + r)I-\mu R$$ con 
+$$\dot S = \mu N(1-p)-\beta S\frac{I}{N} -\mu S$$
+$$\dot I = \beta S\frac{I}{N} -(\gamma  +\mu +r) I$$
+$$\dot R =\mu N p +(\gamma + r)I-\mu R$$ con
 
 $$N=S+I+R$$
 
 -   Dibuja un esquema por compartimentos de este modelo
--   Justifica porque es un buen sistema de ecuaciones para describir el problema
 
-Es un modelo adecuado para enfermedades que generan inmunidad prácticamente de por vida y tienen una vacuna disponible. Tiene en cuenta la demografía de tal manera que se conserva la población (toma en cuenta para la matalidad la muerte de la población en total). Además de ello, toma en cuenta la tasa a la que se tratan con fármacos los infectados. En resumen es un modelo SIR con consideraciones extra como la vacunación, y por ello resulta increíblemente útil para fijar objetivos de vacunación, tanto en regiones que tienen tratamiento disponible como en las que no. 
+![](b.jpeg)
+
+-   Justifica porque es un buen sistema de ecuaciones para describir el
+    problema
+
+Es un modelo adecuado para enfermedades que generan inmunidad
+prácticamente de por vida y tienen una vacuna disponible. Tiene en
+cuenta la demografía de tal manera que se conserva la población (toma en
+cuenta para la matalidad la muerte de la población en total). Además de
+ello, toma en cuenta la tasa a la que se tratan con fármacos los
+infectados. En resumen es un modelo SIR con consideraciones extra como
+la vacunación, y por ello resulta increíblemente útil para fijar
+objetivos de vacunación, tanto en regiones que tienen tratamiento
+disponible como en las que no.
 
 -   Encuentra $p_c$ en ausencia de tratamiento ($r=0$)
+
+![](b2.jpeg)
+
+$p_c=1-\frac {\gamma+\mu+r}{\beta}$
+
+$p_c=0.901$
+
 -   Encuentra $p_c$ con $r=0.2$
+
+$p_c=0.6688$
+
 -   Resuelve numéricamente este sistema en R.
 
 ```{r, cache = TRUE}
-mu <- 1/75
-p <- 0.3
+mu <- 1/(75*365)
+p <- 0.6688
 beta <- 0.86
 gamma <- 1/14
 r <- 0.2
@@ -142,9 +217,18 @@ matplot(out[ , 1], out [ , 2:4], type = "l", xlab = "tiempo", ylab = "Poblacion 
 
 ## Modelos de transmisón directa e indirecta
 
-Algunas enfermedades pueden propagarse de más de una manera. Por ejemplo, el cólera puede transmitirse de persona a persona, pero también puede transmitirse indirectamente a través de un patógeno liberado por personas infectadas a través de un medio como agua contaminada. Considera un modelo epidémico con transmisión directa (de persona a persona) e indirecta (a través de un medio como agua contaminada). A un modelo S I R simple le agregamos un patógeno $B$ liberado por personas infectadas. Suponemos que la infectividad del patógeno es proporcional a su concentración. El modelo resultante es:
+Algunas enfermedades pueden propagarse de más de una manera. Por
+ejemplo, el cólera puede transmitirse de persona a persona, pero también
+puede transmitirse indirectamente a través de un patógeno liberado por
+personas infectadas a través de un medio como agua contaminada.
+Considera un modelo epidémico con transmisión directa (de persona a
+persona) e indirecta (a través de un medio como agua contaminada). A un
+modelo S I R simple le agregamos un patógeno $B$ liberado por personas
+infectadas. Suponemos que la infectividad del patógeno es proporcional a
+su concentración. El modelo resultante es:
 
-$$ \dot S= -\beta_1SI -\beta_2 SB$$ $$\dot I =  \beta_1SI + \beta_2 SB -\gamma I$$
+$$ \dot S= -\beta_1SI -\beta_2 SB$$
+$$\dot I =  \beta_1SI + \beta_2 SB -\gamma I$$
 
 $$\dot R =\gamma I$$
 
@@ -153,15 +237,40 @@ $$\dot B = rI -\delta B$$
 con $N=S+I+R$
 
 -   Dibuja un esquema por compartimentos de este modelo
--   Justifica porque es un buen sistema de ecuaciones para describir el problema
 
-Es bueno debido a que separa las betas debido a que la interacción con un infectado no es la misma (carga bacteriana alta y bacterias activas) que con bacterias del ambiente que pueden estar en un estado menos óptimo para infectar (debido al estrés del ambiente) y que la carga con la que se inocula el susceptible sea menor. Además de ello, la carga ambiental considera que  hay un mecanismo general por el cual las bacterias mueren fuera del cuerpo dada $\delta$. Sólo se podría mejorar si se añade demografía, y tal vez añadir términos que consideraran la toma preferencial de fuentes de agua limpia a de agua contaminada (hasta cierto umbral donde no hay fuentes de agua limpia para todos).
+![](c.jpeg)
 
--   Justifica porque la siguiente expresión puede ser un buen $R_0=\frac{\beta_1 N}{\gamma} +\frac{r\beta_2 N}{\gamma \delta}$
+-   Justifica porque es un buen sistema de ecuaciones para describir el
+    problema
 
-Es un buen R0 debido a que suma los infectados causados mediante los 2 tipos de interacción (sería un error por ejemplo multiplicar $beta_1$ por $beta_2$). Además de ello, $beta_1$ contribuye negativamente solo a la parte de $beta_2$ (seria otro error que $\delta$ dividiera a $beta_1$). de igual manera $r$ solo afecta a la contribución de $beta_2$. Sin embargo, incluir la $N$ como multiplicador de ambas es inadecuado, ya que los resistentes no favorecen la dinámica de infección. $R_0$ no consideraría los niveles poblacionales de susceptibles e infectados, si fuese $R_t$ entonces podría añadirse un término con N para modelar la población de susceptibles y como beneficia a la dinámica de infección (al término I). 
+Es bueno debido a que separa las betas debido a que la interacción con
+un infectado no es la misma (carga bacteriana alta y bacterias activas)
+que con bacterias del ambiente que pueden estar en un estado menos
+óptimo para infectar (debido al estrés del ambiente) y que la carga con
+la que se inocula el susceptible sea menor. Además de ello, la carga
+ambiental considera que hay un mecanismo general por el cual las
+bacterias mueren fuera del cuerpo dada $\delta$. Sólo se podría mejorar
+si se añade demografía, y tal vez añadir términos que consideraran la
+toma preferencial de fuentes de agua limpia a de agua contaminada (hasta
+cierto umbral donde no hay fuentes de agua limpia para todos).
 
--   Resuelve numéricamente este sistema en R para valores de $R_0 >1$ y $R_0 <1$ Discute tus resultados.
+-   Justifica porque la siguiente expresión puede ser un buen
+    $R_0=\frac{\beta_1 N}{\gamma} +\frac{r\beta_2 N}{\gamma \delta}$
+
+Es un buen R0 debido a que suma los infectados causados mediante los 2
+tipos de interacción (sería un error por ejemplo multiplicar $beta_1$
+por $beta_2$). Además de ello, $beta_1$ contribuye negativamente solo a
+la parte de $beta_2$ (seria otro error que $\delta$ dividiera a
+$beta_1$). de igual manera $r$ solo afecta a la contribución de
+$beta_2$. Sin embargo, incluir la $N$ como multiplicador de ambas es
+inadecuado, ya que los resistentes no favorecen la dinámica de
+infección. $R_0$ no consideraría los niveles poblacionales de
+susceptibles e infectados, si fuese $R_t$ entonces podría añadirse un
+término con N para modelar la población de susceptibles y como beneficia
+a la dinámica de infección (al término I).
+
+-   Resuelve numéricamente este sistema en R para valores de $R_0 >1$ y
+    $R_0 <1$ Discute tus resultados.
 
 con $S+I+R=N=1$
 
@@ -204,8 +313,13 @@ matplot(out[ , 1], out [ , 2:5], type = "l", xlab = "tiempo", ylab = "Poblacion 
         legend("topright", c("S", "I", "R","B"), col = c("#FD4235","#CC53CC","#41521F","#E9C46A"), lwd = 4,lty=1, cex=0.75)
 ```
 
-En un inicio hay crecimiento exponencial de los infectados y vemos una curva epidémica normal en la que caen los susceptibles y los recuperados crecen hasta que se alcanza inmunidad de rebaño (herd-immunity) por lo que los infectados vuelven a caer a un punto free-disease (en este caso, free disease es estable porque la inmunidad es de por vida y no hay nacimiento de susceptibles). Además vemos que coincide un pico de bacterias ambientales con el pico de infectados.
-
+En un inicio hay crecimiento exponencial de los infectados y vemos una
+curva epidémica normal en la que caen los susceptibles y los recuperados
+crecen hasta que se alcanza inmunidad de rebaño (herd-immunity) por lo
+que los infectados vuelven a caer a un punto free-disease (en este caso,
+free disease es estable porque la inmunidad es de por vida y no hay
+nacimiento de susceptibles). Además vemos que coincide un pico de
+bacterias ambientales con el pico de infectados.
 
 con $\beta_1=0.2;\beta_2=0.05;r=0.75;\gamma=0.3;\delta=0.9$
 
@@ -244,28 +358,64 @@ matplot(out[ , 1], out [ , 2:5], type = "l", xlab = "tiempo", ylab = "Poblacion 
         legend("topright", c("S", "I", "R","B"), col = c("#FD4235","#CC53CC","#41521F","#E9C46A"), lwd = 4,lty=1, cex=0.75)
 ```
 
-En este caso los infectados (5% de la poblacion inicial) no logran incrementar sus números e infectan únicamente a unos cuantos susceptibles, y pasan todos a recuperarse sin observar un pico de crecimiento de infectados (no hay curva epidémica). El nivel de bacterias en el ambiente siempre se mantiene bajo. La mayoría de personas nunca se infecta y la enfermedad desaparece de la población después de un tiempo. 
-
+En este caso los infectados (5% de la poblacion inicial) no logran
+incrementar sus números e infectan únicamente a unos cuantos
+susceptibles, y pasan todos a recuperarse sin observar un pico de
+crecimiento de infectados (no hay curva epidémica). El nivel de
+bacterias en el ambiente siempre se mantiene bajo. La mayoría de
+personas nunca se infecta y la enfermedad desaparece de la población
+después de un tiempo.
 
 ## Enfermedades transmitidas por vectores
 
-La oncocercosis, también conocida como "ceguera de los ríos", es una enfermedad transmitida por vectores que afecta la piel y los ojos de los seres humanos. Es endémica en partes de África, Yemen y América Central, y es especialmente prevalente en el África subsahariana. Se transmite por Onchocerca volvulus, un gusano parásito cuyo ciclo de vida incluye cinco etapas larvarias, incluyendo una etapa que requiere un huésped humano y otra etapa que requiere un huésped mosca negra.
+La oncocercosis, también conocida como "ceguera de los ríos", es una
+enfermedad transmitida por vectores que afecta la piel y los ojos de los
+seres humanos. Es endémica en partes de África, Yemen y América Central,
+y es especialmente prevalente en el África subsahariana. Se transmite
+por Onchocerca volvulus, un gusano parásito cuyo ciclo de vida incluye
+cinco etapas larvarias, incluyendo una etapa que requiere un huésped
+humano y otra etapa que requiere un huésped mosca negra.
 
-La hora pico de picadura de las moscas negras es durante las horas diurnas, y las moscas negras permanecen cerca de sus lugares de reproducción en aguas bien oxigenadas. Por lo tanto, las comunidades en el borde del río están más expuestas al riesgo. La etapa del vector es muy complicada, y sería difícil incluir todas sus etapas en un modelo. Supondremos un tamaño de población total constante para el vector con un modelo SI para los vectores.
+La hora pico de picadura de las moscas negras es durante las horas
+diurnas, y las moscas negras permanecen cerca de sus lugares de
+reproducción en aguas bien oxigenadas. Por lo tanto, las comunidades en
+el borde del río están más expuestas al riesgo. La etapa del vector es
+muy complicada, y sería difícil incluir todas sus etapas en un modelo.
+Supondremos un tamaño de población total constante para el vector con un
+modelo SI para los vectores.
 
-El medicamento estándar para el tratamiento de la oncocercosis es la ivermectina; la administración oral mata las larvas rápidamente pero no mata a los gusanos adultos. Sin embargo, reduce su tasa reproductiva durante varios meses. El tratamiento con ivermectina está disponible para una fracción $p$ de la población, limitada por restricciones sobre quiénes pueden recibir la medicación, atención médica limitada y disposición a participar.
+El medicamento estándar para el tratamiento de la oncocercosis es la
+ivermectina; la administración oral mata las larvas rápidamente pero no
+mata a los gusanos adultos. Sin embargo, reduce su tasa reproductiva
+durante varios meses. El tratamiento con ivermectina está disponible
+para una fracción $p$ de la población, limitada por restricciones sobre
+quiénes pueden recibir la medicación, atención médica limitada y
+disposición a participar.
 
-Escibe un conjunto de ecuaciones diferenciales que describan esa situación. Justifica tus respuestas describiendo con detalle tus ecuaciones y supuestos asumidos. Resuelve tu sistema en R.
+Escibe un conjunto de ecuaciones diferenciales que describan esa
+situación. Justifica tus respuestas describiendo con detalle tus
+ecuaciones y supuestos asumidos. Resuelve tu sistema en R.
 
-$S_V$ son los vectores susceptibles
+$S_V$ son los vectores susceptibles 
+
 $I_V$ son los vectores infectados
+
 $S_H$ son los humanos susceptibles
+
 $I_H$ son los humanos infectados
+
 $I_{HT}$ son los humanos infectados y tratados
 
-El modelo asume que las personas cercanas y lejanas a los ríos son tratados a la misma tasa, que la infección cerca o lejos del río sigue el mismo curso, que la reducción en interacción de las personas lejanas es una constante (no decae con la distancia, solo es diferente a partir de un umbral), que la proporción de personas cerca y lejos de los rios permanece constante, no considera la actividad nocturna o diurna de los vectores. Considera Betas distintas de infección a vectores y a humanos, y solo permite tratamiento hasta un umbral.
+![](d.jpeg)
 
-
+El modelo asume que las personas cercanas y lejanas a los ríos son
+tratados a la misma tasa, que la infección cerca o lejos del río sigue
+el mismo curso, que la reducción en interacción de las personas lejanas
+es una constante (no decae con la distancia, solo es diferente a partir
+de un umbral), que la proporción de personas cerca y lejos de los rios
+permanece constante, no considera la actividad nocturna o diurna de los
+vectores. Considera Betas distintas de infección a vectores y a humanos,
+y solo permite tratamiento hasta un umbral.
 
 $$ \dot S_V= \mu(S_V+I_V)
 -          m\beta_VS_VI_H
@@ -274,17 +424,24 @@ $$ \dot S_V= \mu(S_V+I_V)
 -(1-m)t\alpha\beta_VS_VI_{HT}
 -\mu S_V$$
 
-$m(S_V+I_V)$ es la natalidad que compensa la mortalidad de los vectores $\mu$
+$m(S_V+I_V)$ es la natalidad que compensa la mortalidad de los vectores
+$\mu$
 
-$m\beta_VS_VI_H$ modela la infección de moscas susceptibles al interactuar con humanos infectados cerca del rio (proporcion m)
+$m\beta_VS_VI_H$ modela la infección de moscas susceptibles al
+interactuar con humanos infectados cerca del rio (proporcion m)
 
-$(1-m)\alpha\beta_VS_VI_H$ modela la infección de moscas susceptibles al interactuar con humanos infectados lejos del rio (proporcion 1-m). La interacción entre moscas infectadas y humanos se ve atenuada por $\alpha$
+$(1-m)\alpha\beta_VS_VI_H$ modela la infección de moscas susceptibles al
+interactuar con humanos infectados lejos del rio (proporcion 1-m). La
+interacción entre moscas infectadas y humanos se ve atenuada por
+$\alpha$
 
-$mt\beta_VS_VI_{HT}$ modela la infección de moscas susceptibles al interactuar con humanos infectados pero también tratados cerca del rio (proporcion m). La interacción no es tan eficaz porque hay menos parasitemia en estos pacientes (atenuado por $t$)
+$mt\beta_VS_VI_{HT}$ modela la infección de moscas susceptibles al
+interactuar con humanos infectados pero también tratados cerca del rio
+(proporcion m). La interacción no es tan eficaz porque hay menos
+parasitemia en estos pacientes (atenuado por $t$)
 
-$(1-m)t\alpha\beta_VS_VI_{HT}$ Considera a las personas tratadas y que están lejos del rio (1-m)
-
-
+$(1-m)t\alpha\beta_VS_VI_{HT}$ Considera a las personas tratadas y que
+están lejos del rio (1-m)
 
 $$ \dot I_V=
 +          m\beta_VS_VI_H
@@ -302,7 +459,8 @@ $\eta(S_H+I_H+I_{HT})$ natalidad que compensa la mortalidad de humanos
 
 $m\beta_HS_HI_V$ infección de personas cercanas al rio m
 
-$(1-m)\alpha\beta_HS_HI_V$ infeccion de personas lejanas al rio 1-m modificada por interacción disminuida ($\alpha$)
+$(1-m)\alpha\beta_HS_HI_V$ infeccion de personas lejanas al rio 1-m
+modificada por interacción disminuida ($\alpha$)
 
 $$ \dot I_H=
 +m\beta_HS_HI_V
@@ -310,11 +468,11 @@ $$ \dot I_H=
 -(p-I_{HT})I_H
 -\eta I_H$$
 
-$(p-I_{HT})I_H$ Tratamiento de personas infectadas hasta alcanzar un valor umbral de tratamiento disponible ($p$)
+$(p-I_{HT})I_H$ Tratamiento de personas infectadas hasta alcanzar un
+valor umbral de tratamiento disponible ($p$)
 
 $$ \dot I_{HT}=(p-I_{HT})I_H
 -\eta I_{HT}$$
-
 
 ```{r, cache = TRUE}
 mu <- 1/21
@@ -349,10 +507,17 @@ matplot(out[ , 1], out [ , 2:6], type = "l", xlab = "tiempo", ylab = "Poblacion"
         legend("topright", c("Sv", "Iv", "Sh","Ih","Iht"), col = c("#FD4235","#CC53CC","#41521F","#E9C46A","#4281A4"), lwd = 4,lty=1, cex=0.75)
 ```
 
-La mayoría de personas y vectores se infecta al final. Al inicio casi todos los infectados se tratan y así no hay un decaimiento rápido de los susceptibles pero se alcanza un punto de saturacion de tratamiento, suben los infectados rápidamente y los susceptibles decaen de igual manera.
+La mayoría de personas y vectores se infecta al final. Al inicio casi
+todos los infectados se tratan y así no hay un decaimiento rápido de los
+susceptibles pero se alcanza un punto de saturacion de tratamiento,
+suben los infectados rápidamente y los susceptibles decaen de igual
+manera.
 
 ## Tydiverse
-Utiliza la librería `palmerpenguins` par el siguiente problema. Carga los datos, incluidos en esa librería, `penguins` a partir de ello escribe un script en R qu resuelva lo siguiente:
+
+Utiliza la librería `palmerpenguins` par el siguiente problema. Carga
+los datos, incluidos en esa librería, `penguins` a partir de ello
+escribe un script en R qu resuelva lo siguiente:
 
 ```{r, cache = TRUE}
 library(dplyr)
@@ -361,18 +526,20 @@ Datos_pingu <- palmerpenguins::penguins
 
 ```
 
- 1. Filtra los pingüinos que pertenecen a la especie "Adelie" y tienen un peso corporal mayor a 3500 gramos.
- 
+1.  Filtra los pingüinos que pertenecen a la especie "Adelie" y tienen
+    un peso corporal mayor a 3500 gramos.
+
 ```{r, cache = TRUE}
 
 glimpse(Datos_pingu)
 Filtrado1 <- Datos_pingu %>% filter(species=="Adelie"&body_mass_g>3500)
 glimpse(Filtrado1)
 ```
- 
-2. Crea una nueva columna llamada "bmi" (Body Mass Index) que represente el índice de masa corporal usando la fórmula: 
-$$ BMI = peso (kg) / (altura (m))^2$$.
-La altura está representada en centímetros en la base de datos, así que conviértela a metros.
+
+2.  Crea una nueva columna llamada "bmi" (Body Mass Index) que
+    represente el índice de masa corporal usando la fórmula:
+    $$ BMI = peso (kg) / (altura (m))^2$$. La altura está representada
+    en centímetros en la base de datos, así que conviértela a metros.
 
 ```{r, cache = TRUE}
 Pingu_BMI <- Datos_pingu %>%
@@ -382,7 +549,8 @@ Pingu_BMI <- Datos_pingu %>%
 glimpse(Pingu_BMI)
 ```
 
-3. Agrupa los datos por la especie y calcula la media del índice de masa corporal (bmi) para cada especie.
+3.  Agrupa los datos por la especie y calcula la media del índice de
+    masa corporal (bmi) para cada especie.
 
 ```{r, cache = TRUE}
 Pingu_BMI <- Pingu_BMI %>% group_by(species) 
@@ -390,14 +558,16 @@ Resumen_BMI <- Pingu_BMI %>% summarise(avg = mean(BMI))
 Resumen_BMI
 ```
 
-4. Ordena las especies por la media del índice de masa corporal de manera descendente.
+4.  Ordena las especies por la media del índice de masa corporal de
+    manera descendente.
 
 ```{r, cache = TRUE}
 Pingu_BMI <- Pingu_BMI %>% arrange(factor(species, levels = c("Gentoo","Adelie","Chinstrap")))
 glimpse(Pingu_BMI)
 ```
 
-5. Realiza un diagrama de barras de la media del índice de masa corporal por especie.
+5.  Realiza un diagrama de barras de la media del índice de masa
+    corporal por especie.
 
 ```{r, cache = TRUE}
 Nombres<-Pingu_BMI %>% select(species) %>% unique() %>% unlist()
@@ -407,27 +577,32 @@ box(bty="l")
 
 ### Datos covid México
 
-1. Cargar Datos y Explorar:
-- Carga el conjunto de datos proporcionado.
+1.  Cargar Datos y Explorar:
+
+-   Carga el conjunto de datos proporcionado.
 
 ```{r, cache = TRUE}
 library(vroom)
 datos_covid <- vroom("221129COVID19MEXICO.csv")
 ```
 
-- Muestra las primeras filas para entender su estructura.
+-   Muestra las primeras filas para entender su estructura.
+
 ```{r, cache = TRUE}
 glimpse(datos_covid)
 ```
-2. Filtrado y Resumen:
-- Filtra los datos para incluir solo los casos de mujeres mayores de 30 años con diabetes.
+
+2.  Filtrado y Resumen:
+
+-   Filtra los datos para incluir solo los casos de mujeres mayores de
+    30 años con diabetes.
 
 ```{r, cache = TRUE}
 covid_filtrado <- datos_covid %>% filter(CLASIFICACION_FINAL==3&SEXO==1&DIABETES==1&EDAD>30)
 #casos positivos
 ```
 
-- Calcula la cantidad total de casos y la edad promedio de este grupo.
+-   Calcula la cantidad total de casos y la edad promedio de este grupo.
 
 ```{r, cache = TRUE}
 glimpse(covid_filtrado)
@@ -436,9 +611,10 @@ covid_filtrado %>% summarise(avg = mean(EDAD))
 #56.4 añoss
 ```
 
+3.  Gráfica de Barras:
 
-3. Gráfica de Barras:
-- Crea un gráfico de barras que muestre la cantidad de casos por sector.
+-   Crea un gráfico de barras que muestre la cantidad de casos por
+    sector.
 
 ```{r, cache = TRUE}
 resumen_sector<- datos_covid %>% filter(CLASIFICACION_FINAL==3) %>% group_by(SECTOR) %>% summarise(n = length(SECTOR))
@@ -466,15 +642,19 @@ nombres_sector
 barplot(as.numeric(nombres_sector[,2])~nombres_sector[,1],ylim=c(0.5,5.5),xpd=FALSE,col=rainbow(14),ylab="log10(Numero de casos)")
 box(bty="l")
 ```
-4. Análisis Temporal:
-- Convierte la columna de fechas a formato de fecha.
+
+4.  Análisis Temporal:
+
+-   Convierte la columna de fechas a formato de fecha.
 
 ```{r, cache = TRUE,fig.dim=c(24,5)}
 library(lubridate)
 covid_dates <- datos_covid %>% mutate(num_day=as.numeric(as.POSIXct(FECHA_INGRESO, format="%Y-%m-%d"))/86400)
 ```
 
-- Filtra los datos para incluir solo los casos desde el 1 de enero de 2020 hasta el 31 de diciembre de 2021.
+-   Filtra los datos para incluir solo los casos desde el 1 de enero de
+    2020 hasta el 31 de diciembre de 2021.
+
 ```{r, cache = TRUE}
 glimpse(covid_dates)
 hist(covid_dates$num_day,breaks=max(covid_dates$num_day)-min(covid_dates$num_day))
@@ -492,17 +672,19 @@ uppdate<-as.numeric(as.POSIXct(as.Date("2022-05-01"), format="%Y-%m-%d"))/86400
 filter_dates <- covid_dates %>% filter(num_day<uppdate&num_day>lowdate)
 glimpse(filter_dates)
 ```
-- Crea una gráfica de líneas que muestre la evolución diaria de casos en ese periodo.
+
+-   Crea una gráfica de líneas que muestre la evolución diaria de casos
+    en ese periodo.
 
 ```{r, cache = TRUE}
 number_bars <- max(filter_dates$num_day)-min(filter_dates$num_day)
 freq <- hist(filter_dates$FECHA_INGRESO,breaks=number_bars,col=rainbow(number_bars))
 ```
-- Estima el $R_0$ y $R_t$
+
+-   Estima el $R_0$ y $R_t$
 
 ```{r, cache = TRUE}
 library(EpiEstim)
-freq
 incidencia <- as.data.frame(matrix(NA,nrow=118,ncol=2))
 colnames(incidencia) <- c("Fecha","I")
 incidencia[,"Fecha"] <- as.Date(freq$breaks, origin="1970-01-01")[-1]
