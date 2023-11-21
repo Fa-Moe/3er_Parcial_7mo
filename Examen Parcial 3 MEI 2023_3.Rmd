@@ -401,7 +401,7 @@ glimpse(Pingu_BMI)
 
 ```{r, cache = TRUE}
 Nombres<-Pingu_BMI %>% select(species) %>% unique() %>% unlist()
-barplot(rev(sort(unlist(Resumen_BMI)[4:6]))~Nombres,ylim=c(15,21),xpd=FALSE,col=c("lightyellow","lightgreen","lightblue"))
+barplot(rev(sort(unlist(Resumen_BMI)[4:6]))~Nombres,ylim=c(15,21),xpd=FALSE,col=c("lightyellow","lightgreen","lightblue"),ylab="BMI promedio")
 box(bty="l")
 ```
 
@@ -423,14 +423,79 @@ glimpse(datos_covid)
 - Filtra los datos para incluir solo los casos de mujeres mayores de 30 años con diabetes.
 
 ```{r, cache = TRUE}
-#datos_covid %>% 
+covid_filtrado <- datos_covid %>% filter(CLASIFICACION_FINAL==3&SEXO==1&DIABETES==1&EDAD>30)
+#casos positivos
 ```
 
 - Calcula la cantidad total de casos y la edad promedio de este grupo.
+
+```{r, cache = TRUE}
+glimpse(covid_filtrado)
+#Son 98111 casos
+covid_filtrado %>% summarise(avg = mean(EDAD))
+#56.4 añoss
+```
+
+
 3. Gráfica de Barras:
 - Crea un gráfico de barras que muestre la cantidad de casos por sector.
+
+```{r, cache = TRUE}
+resumen_sector<- datos_covid %>% filter(CLASIFICACION_FINAL==3) %>% group_by(SECTOR) %>% summarise(n = length(SECTOR))
+```
+
+```{r, cache = TRUE,fig.dim=c(24,5)}
+nombres_sector <- cbind(c("CRUZ ROJA",
+"DIF",
+"ESTATAL",
+"IMSS",
+"IMSS-BIENESTAR",
+"ISSSTE",
+"MUNICIPAL",
+"PEMEX",
+"PRIVADA",
+"SEDENA",
+"SEMAR",
+"SSA",
+"UNIVERSITARIO",
+"NO ESPECIFICADO"),
+resumen_sector$n)
+nombres_sector
+nombres_sector[,2] <- log10(as.numeric(nombres_sector[,2]))
+nombres_sector
+barplot(as.numeric(nombres_sector[,2])~nombres_sector[,1],ylim=c(0.5,5.5),xpd=FALSE,col=rainbow(14),ylab="log10(Numero de casos)")
+box(bty="l")
+```
 4. Análisis Temporal:
 - Convierte la columna de fechas a formato de fecha.
+
+```{r, cache = TRUE,fig.dim=c(24,5),cache.lazy = FALSE}
+library(lubridate)
+covid_dates <- datos_covid %>% mutate(num_date=as.numeric(as.POSIXct(FECHA_INGRESO, format="%Y-%m-%d"))) %>% mutate(num_day = num_date/86400)
+```
+
 - Filtra los datos para incluir solo los casos desde el 1 de enero de 2020 hasta el 31 de diciembre de 2021.
+```{r, cache = TRUE,cache.lazy = FALSE}
+glimpse(covid_dates)
+hist(covid_dates$num_day,breaks=max(covid_dates$num_day)-min(covid_dates$num_day))
+as.numeric(as.POSIXct(as.Date("2020-01-01"), format="%Y-%m-%d"))/86400
+as.numeric(as.POSIXct(as.Date("2021-12-31"), format="%Y-%m-%d"))/86400
+
+filter_dates <- covid_dates %>% filter(as.numeric(num_day)<18995)
+glimpse(filter_dates)
+#La base de datos justo empieza a reportar la fecha de ingreso de casos en 1ro de enero de 2022. (Al usar <18992 la base de datos tenía 0 renglones.)
+
+
+lowdate<-as.numeric(as.POSIXct(as.Date("2022-01-01"), format="%Y-%m-%d"))/86400
+uppdate<-as.numeric(as.POSIXct(as.Date("2022-05-01"), format="%Y-%m-%d"))/86400
+#Lo haremos con los primeros 4 meses de 2022
+filter_dates <- covid_dates %>% filter(num_day<uppdate&num_day>lowdate)
+glimpse(filter_dates)
+```
 - Crea una gráfica de líneas que muestre la evolución diaria de casos en ese periodo.
+
+```{r, cache = TRUE,cache.lazy = FALSE}
+number_bars <- max(filter_dates$num_day)-min(filter_dates$num_day)
+hist(filter_dates$num_day,breaks=number_bars,col=rainbow(number_bars),ylab="Numero de casos")
+```
 - Estima el $R_0$ y $R_t$
